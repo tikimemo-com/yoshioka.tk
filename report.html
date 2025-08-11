@@ -3,52 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>危険情報投稿 - ThikiMemo</title>
-
-  <!-- Firebase -->
+  <title>危険情報投稿 - ちキメモ</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-
-  <!-- 投稿用のJS -->
-  <script src="report.js" defer></script>
-
-  <style>
-    body {
-      font-family: 'Sawarabi Mincho', serif;
-      max-width: 480px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    #message {
-      margin-top: 1rem;
-      color: red;
-    }
-  </style>
+  <script src="script.js" defer></script>
 </head>
-<body>
-  <h1>危険情報を投稿</h1>
+<body class="report-page">
+  <header class="header">
+    <div class="header-content">
+      <a href="dashboard.html" class="logo">🚨 ThikiMemo</a>
+      <button id="logout-button" style="display:none;">ログアウト</button>
+    </div>
+  </header>
 
-  <form id="report-form">
-    <input type="text" id="report-title" placeholder="タイトル" required />
-    <textarea id="report-content" placeholder="内容" rows="6" required></textarea>
-    <button type="submit">送信</button>
-  </form>
-
-  <p id="message"></p>
-
-  <p><a href="dashboard.html">キャンセル（ダッシュボードに戻る）</a></p>
+  <main class="main-container">
+    <h1>危険情報を投稿する</h1>
+    <form id="report-form">
+      <div class="form-group">
+        <label for="report-title">タイトル</label>
+        <input type="text" id="report-title" name="report-title" required placeholder="危険のタイトルを入力" />
+      </div>
+      <div class="form-group">
+        <label for="report-type">種類</label>
+        <select id="report-type" name="report-type" required>
+          <option value="">選択してください</option>
+          <option value="traffic">交通関連</option>
+          <option value="disaster">自然災害</option>
+          <option value="crime">治安・防犯</option>
+          <option value="infrastructure">インフラ</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="report-location">場所</label>
+        <input type="text" id="report-location" name="report-location" required placeholder="危険箇所の場所を入力" />
+      </div>
+      <div class="form-group">
+        <label for="report-description">詳細説明</label>
+        <textarea id="report-description" name="report-description" rows="5" required placeholder="危険の詳細を入力"></textarea>
+      </div>
+      <div id="report-message" class="message" style="display:none;"></div>
+      <button type="submit" class="submit-btn">投稿する</button>
+    </form>
+  </main>
 </body>
 </html>
