@@ -12,6 +12,7 @@ const firebaseConfig = {
 // Firebaseアプリの初期化
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 // DOM要素の取得
 const userStatusElement = document.getElementById('user-status');
@@ -27,7 +28,6 @@ auth.onAuthStateChanged(user => {
         userStatusElement.textContent = `ようこそ、${user.email || 'ユーザー'}さん`;
         logoutLink.style.display = 'block'; // ログアウトボタンを表示
         reportButton.style.display = 'flex'; // 投稿ボタンを表示
-        
     } else {
         // ユーザーがログインしていない場合 (ゲストモード)
         console.log("ユーザーはログインしていません。ゲストモードで表示します。");
@@ -52,20 +52,59 @@ if (logoutLink) {
     });
 }
 
-// ゲストユーザーが投稿ボタンを押した時の処理
+// Firestoreに投稿できるようにする処理
 if (reportButton) {
     reportButton.addEventListener('click', () => {
-        // ログイン状態を再度チェック
         if (!auth.currentUser) {
             alert('投稿するにはログインが必要です。');
             window.location.href = 'index.html';
             return;
         }
-        // 投稿機能（ダミー）
-        alert('新しいメモを追加する機能はまだ実装されていません。');
+
+        // 投稿フォームを作成
+        const formHtml = `
+            <div id="report-form" style="position:fixed;top:20%;left:50%;transform:translateX(-50%);
+                background:#fff;padding:20px;border:1px solid #ccc;border-radius:8px;z-index:1000;">
+                <h3>新しいメモを投稿</h3>
+                <input type="text" id="report-title" placeholder="タイトル" style="width:100%;margin-bottom:8px;"><br>
+                <textarea id="report-content" placeholder="内容" style="width:100%;height:100px;margin-bottom:8px;"></textarea><br>
+                <button id="submit-report">送信</button>
+                <button id="cancel-report">キャンセル</button>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', formHtml);
+
+        // 送信処理
+        document.getElementById('submit-report').addEventListener('click', async () => {
+            const title = document.getElementById('report-title').value.trim();
+            const content = document.getElementById('report-content').value.trim();
+
+            if (!title || !content) {
+                alert('タイトルと内容を入力してください');
+                return;
+            }
+
+            try {
+                await db.collection('reports').add({
+                    title,
+                    content,
+                    uid: auth.currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert('投稿が完了しました');
+                document.getElementById('report-form').remove();
+            } catch (error) {
+                console.error('投稿エラー:', error);
+                alert('投稿に失敗しました');
+            }
+        });
+
+        // キャンセル処理
+        document.getElementById('cancel-report').addEventListener('click', () => {
+            document.getElementById('report-form').remove();
+        });
     });
 }
-
 
 // マップボタンの機能（ダミー）
 if (mapButton) {
@@ -93,6 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    updateStats();
 
     // PWA対応の準備（Service Worker登録など）
     if ('serviceWorker' in navigator) {
