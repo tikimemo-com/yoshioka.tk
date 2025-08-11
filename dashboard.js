@@ -28,9 +28,9 @@ auth.onAuthStateChanged(user => {
         logoutLink.style.display = 'block';
         reportButton.style.display = 'flex';
 
-        // 投稿ボタンのクリックイベントを設定
+        // 投稿ボタンのクリックイベント
         reportButton.onclick = () => {
-            showReportForm();
+            window.location.href = 'report.html';
         };
 
     } else {
@@ -55,54 +55,6 @@ if (logoutLink) {
             console.error("ログアウトエラー:", error);
             alert('ログアウト中にエラーが発生しました。');
         }
-    });
-}
-
-// 投稿フォーム表示＆Firestore書き込み処理
-function showReportForm() {
-    // 既にフォームがあれば重複生成防止
-    if (document.getElementById('report-form')) return;
-
-    const formHtml = `
-        <div id="report-form" style="position:fixed;top:20%;left:50%;transform:translateX(-50%);
-            background:#fff;padding:20px;border:1px solid #ccc;border-radius:8px;z-index:1000;">
-            <h3>新しいメモを投稿</h3>
-            <input type="text" id="report-title" placeholder="タイトル" style="width:100%;margin-bottom:8px;"><br>
-            <textarea id="report-content" placeholder="内容" style="width:100%;height:100px;margin-bottom:8px;"></textarea><br>
-            <button id="submit-report">送信</button>
-            <button id="cancel-report">キャンセル</button>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', formHtml);
-
-    // 送信処理
-    document.getElementById('submit-report').addEventListener('click', async () => {
-        const title = document.getElementById('report-title').value.trim();
-        const content = document.getElementById('report-content').value.trim();
-
-        if (!title || !content) {
-            alert('タイトルと内容を入力してください');
-            return;
-        }
-
-        try {
-            await db.collection('reports').add({
-                title,
-                content,
-                uid: auth.currentUser.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert('投稿が完了しました');
-            document.getElementById('report-form').remove();
-        } catch (error) {
-            console.error('投稿エラー:', error);
-            alert('投稿に失敗しました');
-        }
-    });
-
-    // キャンセル処理
-    document.getElementById('cancel-report').addEventListener('click', () => {
-        document.getElementById('report-form').remove();
     });
 }
 
