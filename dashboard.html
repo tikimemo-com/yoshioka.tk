@@ -1,152 +1,133 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThikiMemo - 地域安全情報共有プラットフォーム</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="dashboard.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ダッシュボード - ちキメモ</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="script.js" defer></script>
 </head>
 <body class="dashboard-page">
-    <header class="header">
-        <div class="header-content">
-            <a href="dashboard.html" class="logo">
-                🚨 ThikiMemo
-            </a>
-            <nav class="nav-menu">
-                <a href="#" class="nav-item">マップ</a>
-                <a href="#" class="nav-item">投稿一覧</a>
-                <a href="#" class="nav-item">統計</a>
-                <a href="#" class="nav-item">設定</a>
-            </nav>
-            <a href="index.html" class="login-button">ログイン</a>
-        </div>
-    </header>
-
-    <main class="main-container">
-        <section class="hero-section">
-            <h1 class="hero-title">地域の安全を守る</h1>
-            <p class="hero-subtitle">
-                あなたの街の危険情報をみんなで共有し、<br>
-                より安全なコミュニティを作りましょう
-            </p>
-            <div class="cta-buttons">
-                <a href="#" class="cta-button" onclick="reportDanger()">
-                    📍 危険を報告
-                </a>
-                <a href="#" class="cta-button secondary" onclick="viewMap()">
-                    🗺️ マップを見る
-                </a>
-            </div>
-        </section>
-
-        <section class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-number" id="totalReports">247</div>
-                <div class="stat-label">総投稿数</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="thisWeek">12</div>
-                <div class="stat-label">今週の投稿</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="activeUsers">89</div>
-                <div class="stat-label">アクティブユーザー</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="resolvedIssues">156</div>
-                <div class="stat-label">解決済み</div>
-            </div>
-        </section>
-
-        <section class="danger-types-section">
-            <h2 class="section-title">危険の種類</h2>
-            <div class="danger-grid">
-                <div class="danger-card traffic" onclick="filterByType('traffic')">
-                    <div class="danger-icon">🚗</div>
-                    <h3 class="danger-title">交通関連</h3>
-                    <p class="danger-count">87件の報告</p>
-                    <p class="danger-examples">交通事故多発地点、道路工事、信号故障など</p>
-                </div>
-                <div class="danger-card disaster" onclick="filterByType('disaster')">
-                    <div class="danger-icon">⚠️</div>
-                    <h3 class="danger-title">自然災害</h3>
-                    <p class="danger-count">34件の報告</p>
-                    <p class="danger-examples">土砂崩れ、浸水注意、強風被害など</p>
-                </div>
-                <div class="danger-card crime" onclick="filterByType('crime')">
-                    <div class="danger-icon">🔐</div>
-                    <h3 class="danger-title">治安・防犯</h3>
-                    <p class="danger-count">52件の報告</p>
-                    <p class="danger-examples">不審者情報、盗難多発地区、暗い道路など</p>
-                </div>
-                <div class="danger-card infrastructure" onclick="filterByType('infrastructure')">
-                    <div class="danger-icon">🏗️</div>
-                    <h3 class="danger-title">インフラ</h3>
-                    <p class="danger-count">74件の報告</p>
-                    <p class="danger-examples">道路損傷、電柱傾斜、マンホール破損など</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="map-preview">
-            <h2 class="section-title">危険情報マップ</h2>
-            <div class="map-placeholder" onclick="openFullMap()">
-                <div>🗺️ クリックして詳細マップを表示</div>
-            </div>
-        </section>
-
-        <section class="recent-reports">
-            <h2 class="section-title">最新の報告</h2>
-            <div class="recent-list">
-                <div class="recent-item urgent" onclick="viewReport('r1')">
-                    <div class="recent-icon">🚗</div>
-                    <div class="recent-content">
-                        <div class="recent-title">交差点での接触事故発生</div>
-                        <div class="recent-details">
-                            <div class="recent-location">📍 市役所前交差点</div>
-                            <div class="recent-time">⏰ 15分前</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="recent-item warning" onclick="viewReport('r2')">
-                    <div class="recent-icon">⚠️</div>
-                    <div class="recent-content">
-                        <div class="recent-title">大雨による道路冠水の恐れ</div>
-                        <div class="recent-details">
-                            <div class="recent-location">📍 中央公園周辺</div>
-                            <div class="recent-time">⏰ 1時間前</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="recent-item info" onclick="viewReport('r3')">
-                    <div class="recent-icon">🏗️</div>
-                    <div class="recent-content">
-                        <div class="recent-title">歩道のひび割れを発見</div>
-                        <div class="recent-details">
-                            <div class="recent-location">📍 駅前商店街</div>
-                            <div class="recent-time">⏰ 2時間前</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div class="floating-actions">
-        <button class="floating-button primary" onclick="reportDanger()" title="危険を報告">
-            📍
-        </button>
-        <button class="floating-button secondary" onclick="viewMap()" title="マップを表示">
-            🗺️
-        </button>
+  <header class="header">
+    <div class="header-content">
+      <a href="dashboard.html" class="logo">🚨 ThikiMemo</a>
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">マップ</a>
+        <a href="dashboard.html#recent-reports" class="nav-item">投稿一覧</a>
+        <a href="dashboard.html#stats" class="nav-item">統計</a>
+        <a href="dashboard.html#settings" class="nav-item">設定</a>
+      </nav>
+      <button id="logout-button" style="display:none;">ログアウト</button>
     </div>
+  </header>
+
+  <main class="main-container">
+    <section class="hero-section">
+      <h1 class="hero-title">地域の安全を守る</h1>
+      <p class="hero-subtitle">
+        あなたの街の危険情報をみんなで共有し、<br />
+        より安全なコミュニティを作りましょう
+      </p>
+      <div class="cta-buttons">
+        <a href="report.html" class="cta-button">📍 危険を報告</a>
+        <a href="#" class="cta-button secondary" onclick="viewMap()">🗺️ マップを見る</a>
+      </div>
+    </section>
+
+    <section id="stats" class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-number" id="totalReports">0</div>
+        <div class="stat-label">総投稿数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="thisWeek">0</div>
+        <div class="stat-label">今週の投稿</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="activeUsers">0</div>
+        <div class="stat-label">アクティブユーザー</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="resolvedIssues">0</div>
+        <div class="stat-label">解決済み</div>
+      </div>
+    </section>
+
+    <section id="recent-reports" class="recent-reports">
+      <h2 class="section-title">最新の報告</h2>
+      <div class="recent-list" id="reports-list">
+        <!-- 投稿がここに表示されます -->
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 最新投稿をFirestoreから読み込んで表示
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!firebase.auth().currentUser) return;
+
+      const reportsList = document.getElementById('reports-list');
+      const db = firebase.firestore();
+
+      try {
+        const snapshot = await db.collection('reports').orderBy('timestamp', 'desc').limit(10).get();
+        if (reportsList) {
+          reportsList.innerHTML = '';
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const div = document.createElement('div');
+            div.className = 'recent-item';
+            div.innerHTML = `
+              <div class="recent-icon">${getIconByType(data.type)}</div>
+              <div class="recent-content">
+                <div class="recent-title">${escapeHTML(data.title)}</div>
+                <div class="recent-details">
+                  <div class="recent-location">📍 ${escapeHTML(data.location)}</div>
+                  <div class="recent-time">⏰ ${formatTimestamp(data.timestamp)}</div>
+                </div>
+              </div>
+            `;
+            reportsList.appendChild(div);
+          });
+        }
+      } catch (e) {
+        console.error('投稿取得エラー:', e);
+      }
+    });
+
+    function getIconByType(type) {
+      switch (type) {
+        case 'traffic': return '🚗';
+        case 'disaster': return '⚠️';
+        case 'crime': return '🔐';
+        case 'infrastructure': return '🏗️';
+        default: return '❓';
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, c => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+      })[c]);
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp || !timestamp.toDate) return '';
+      const date = timestamp.toDate();
+      const now = new Date();
+      const diffMs = now - date;
+      if (diffMs < 60000) return 'たった今';
+      if (diffMs < 3600000) return `${Math.floor(diffMs/60000)}分前`;
+      if (diffMs < 86400000) return `${Math.floor(diffMs/3600000)}時間前`;
+      return date.toLocaleDateString();
+    }
+  </script>
 </body>
 </html>
