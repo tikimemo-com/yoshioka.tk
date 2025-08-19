@@ -1,6 +1,6 @@
 /* style.css */
 
-/* ログイン・新規登録ページ専用のスタイル */
+/* ログイン・新規登録ページ専用のレイアウト */
 body.login-page,
 body.register-page {
     font-family: Arial, sans-serif;
@@ -67,7 +67,9 @@ body.register-page {
     box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
 }
 
-.login-btn {
+/* フォーム共通のボタンとチェックボックスのスタイルを明確に分離 */
+.login-btn,
+.register-btn {
     width: 100%;
     padding: 1rem;
     background: #3498db;
@@ -80,7 +82,8 @@ body.register-page {
     transition: background-color 0.3s;
 }
 
-.login-btn:hover {
+.login-btn:hover,
+.register-btn:hover {
     background: #2980b9;
 }
 
@@ -119,6 +122,14 @@ body.register-page {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    /* チェックボックス用のスタイルを追加 */
+    margin-top: -1rem; /* フォームグループの余白を調整 */
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    padding: 0;
 }
 
 .checkbox-group label {
