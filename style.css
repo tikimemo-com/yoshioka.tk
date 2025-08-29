@@ -88,7 +88,7 @@ body.register-page {
 .guest-button {
   display: block;
   margin-top: 1rem;
-  color: #3498db;
+  color: #be6229;
   text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
@@ -169,4 +169,5 @@ body.register-page {
 .info-message {
   background: #2ecc71;
   color: #fff;
+
 }
