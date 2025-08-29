@@ -45,7 +45,7 @@ async function updateStatsFromFirebase() {
             activeUsersElement.textContent = activeUsersCount;
         }
 
-        // 解決済み件数を取得（仮の実装）
+        // 解決済み件数を取得（reportsコレクションにstatus: "resolved"フィールドが必要です）
         const resolvedIssuesSnapshot = await db.collection('reports')
             .where('status', '==', 'resolved')
             .get();
@@ -266,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     if (dashboardLogoutButton) {
         dashboardLogoutButton.addEventListener('click', async () => {
             try {
@@ -316,23 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 既存のダミーデータ生成関数は不要なので削除またはコメントアウト
-/*
-function updateStats() {
-    const stats = {
-        totalReports: Math.floor(Math.random() * 50) + 220,
-        thisWeek: Math.floor(Math.random() * 10) + 8,
-        activeUsers: Math.floor(Math.random() * 20) + 75,
-        resolvedIssues: Math.floor(Math.random() * 30) + 140
-    };
-    Object.keys(stats).forEach(key => {
-        const element = document.getElementById(key);
-        if (element) {
-            element.textContent = stats[key];
-        }
-    });
-}
-*/
+// 既存のダミーデータ生成関数は不要なので削除
 function reportDanger() {
     if (!auth.currentUser) {
         showDialog('危険を報告するにはログインが必要です。');
