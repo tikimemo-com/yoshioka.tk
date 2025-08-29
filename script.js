@@ -17,23 +17,43 @@ const db = firebase.firestore();
 // ダッシュボードの統計データをFirebaseから取得・更新する非同期関数
 async function updateStatsFromFirebase() {
     try {
+        // 総投稿数を取得
         const totalReportsSnapshot = await db.collection('reports').get();
         const totalReportsCount = totalReportsSnapshot.size;
-
         const totalReportsElement = document.getElementById('totalReports');
         if (totalReportsElement) {
             totalReportsElement.textContent = totalReportsCount;
         }
 
-        // 必要に応じて今週の投稿数や解決済み件数なども実装
-        // const now = new Date();
-        // const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        // const thisWeekReportsSnapshot = await db.collection('reports').where('timestamp', '>=', oneWeekAgo).get();
-        // const thisWeekCount = thisWeekReportsSnapshot.size;
-        // const thisWeekElement = document.getElementById('thisWeek');
-        // if (thisWeekElement) {
-        //    thisWeekElement.textContent = thisWeekCount;
-        // }
+        // 今週の投稿数を取得
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const thisWeekReportsSnapshot = await db.collection('reports')
+            .where('timestamp', '>=', oneWeekAgo)
+            .get();
+        const thisWeekCount = thisWeekReportsSnapshot.size;
+        const thisWeekElement = document.getElementById('thisWeek');
+        if (thisWeekElement) {
+            thisWeekElement.textContent = thisWeekCount;
+        }
+
+        // アクティブユーザー数を取得
+        const usersSnapshot = await db.collection('users').get();
+        const activeUsersCount = usersSnapshot.size;
+        const activeUsersElement = document.getElementById('activeUsers');
+        if (activeUsersElement) {
+            activeUsersElement.textContent = activeUsersCount;
+        }
+
+        // 解決済み件数を取得（仮の実装）
+        const resolvedIssuesSnapshot = await db.collection('reports')
+            .where('status', '==', 'resolved')
+            .get();
+        const resolvedIssuesCount = resolvedIssuesSnapshot.size;
+        const resolvedIssuesElement = document.getElementById('resolvedIssues');
+        if (resolvedIssuesElement) {
+            resolvedIssuesElement.textContent = resolvedIssuesCount;
+        }
 
     } catch (error) {
         console.error("統計データの取得エラー:", error);
@@ -246,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     if (dashboardLogoutButton) {
         dashboardLogoutButton.addEventListener('click', async () => {
             try {
@@ -297,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 既存のダミーデータ生成関数は不要なのでコメントアウト
+// 既存のダミーデータ生成関数は不要なので削除またはコメントアウト
 /*
 function updateStats() {
     const stats = {
