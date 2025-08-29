@@ -37,7 +37,7 @@ async function updateStatsFromFirebase() {
             thisWeekElement.textContent = thisWeekCount;
         }
 
-        // アクティブユーザー数を取得
+        // アクティブユーザー数を取得（登録ユーザー数をアクティブユーザーと見なす）
         const usersSnapshot = await db.collection('users').get();
         const activeUsersCount = usersSnapshot.size;
         const activeUsersElement = document.getElementById('activeUsers');
@@ -265,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
 
     if (dashboardLogoutButton) {
         dashboardLogoutButton.addEventListener('click', async () => {
