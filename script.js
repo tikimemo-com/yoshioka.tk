@@ -37,7 +37,7 @@ async function updateStatsFromFirebase() {
             thisWeekElement.textContent = thisWeekCount;
         }
 
-        // アクティブユーザー数を取得（登録ユーザー数をアクティブユーザーと見なす）
+        // アクティブユーザー数を取得
         const usersSnapshot = await db.collection('users').get();
         const activeUsersCount = usersSnapshot.size;
         const activeUsersElement = document.getElementById('activeUsers');
