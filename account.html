@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アカウント情報 - ちキメモ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="script.js" defer></script>
+    <style>
+        .account-container {
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 2rem;
+            text-align: center;
+        }
+        .account-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+            margin-bottom: 1rem;
+        }
+        .account-label {
+            font-weight: bold;
+            color: #2980b9;
+            margin-top: 1rem;
+        }
+        .account-value {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+        }
+        .edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="account-container">
+        <div style="display: flex; justify-content: flex-end;">
+            <button id="edit-account-btn" class="edit-btn" title="編集" style="background: none; border: none; cursor: pointer;">
+                <span style="font-size: 1.6rem; color: #3498db;">✏️</span>
+            </button>
+        </div>
+        <img id="account-avatar-img" class="account-avatar" src="https://www.gravatar.com/avatar?d=mp" alt="アカウント画像">
+        <div class="account-label">表示名</div>
+        <div class="account-value" id="account-display-name">---</div>
+        <div class="account-label">メールアドレス</div>
+        <div class="account-value" id="account-email">---</div>
+        <button id="account-logout-btn" class="logout-btn">ログアウト</button>
+        <div style="margin-top:2rem;">
+            <a href="dashboard.html" class="register-btn">ダッシュボードに戻る</a>
+        </div>
+        <!-- 編集フォーム（初期は非表示） -->
+        <form id="edit-account-form" style="display:none; margin-top:2rem;">
+            <div class="form-group">
+                <label for="edit-display-name">表示名</label>
+                <input type="text" id="edit-display-name" name="edit-display-name" required>
+            </div>
+            <button type="submit" class="login-btn" style="margin-top:1rem;">保存</button>
+            <button type="button" id="cancel-edit-btn" class="guest-button" style="margin-top:1rem;">キャンセル</button>
+        </form>
+    </div>
+    <script>
+        // Firebase初期化は script.js で済んでいる前提
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = firebase.auth();
+            const avatarImg = document.getElementById('account-avatar-img');
+            const displayNameDiv = document.getElementById('account-display-name');
+            const emailDiv = document.getElementById('account-email');
+            const logoutBtn = document.getElementById('account-logout-btn');
+            const editBtn = document.getElementById('edit-account-btn');
+            const editForm = document.getElementById('edit-account-form');
+            const editDisplayName = document.getElementById('edit-display-name');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+            let currentUser = null;
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    avatarImg.src = user.photoURL || 'https://www.gravatar.com/avatar?d=mp';
+                    displayNameDiv.textContent = user.displayName || '（未設定）';
+                    emailDiv.textContent = user.email || '（未設定）';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await auth.signOut();
+                    alert('ログアウトしました。');
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    alert('ログアウトに失敗しました: ' + error.message);
+                }
+            });
+
+            // 編集ボタンでフォーム表示
+            editBtn.addEventListener('click', () => {
+                editDisplayName.value = displayNameDiv.textContent;
+                editForm.style.display = 'block';
+                editBtn.style.display = 'none';
+            });
+
+            // キャンセルボタンでフォーム非表示
+            cancelEditBtn.addEventListener('click', () => {
+                editForm.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+            });
+
+            // 編集フォーム送信
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUser) return;
+                const newName = editDisplayName.value.trim();
+                if (!newName) return;
+                try {
+                    await currentUser.updateProfile({ displayName: newName });
+                    displayNameDiv.textContent = newName;
+                    alert('表示名を更新しました');
+                    editForm.style.display = 'none';
+                    editBtn.style.display = 'inline-block';
+                } catch (error) {
+                    alert('表示名の更新に失敗しました: ' + error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

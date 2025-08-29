@@ -12,7 +12,6 @@ const firebaseConfig = {
 // Firebaseアプリの初期化
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
 
 // DOM要素の取得
 const userStatusElement = document.getElementById('user-status');
@@ -23,23 +22,18 @@ const mapButton = document.getElementById('map-button');
 // ログイン状態の監視
 auth.onAuthStateChanged(user => {
     if (user) {
-        console.log("ログインユーザー:", user.email);
+        // ユーザーがログインしている場合
+        console.log("ユーザーがログインしています:", user.email);
         userStatusElement.textContent = `ようこそ、${user.email || 'ユーザー'}さん`;
-        logoutLink.style.display = 'block';
-        reportButton.style.display = 'flex';
-
-        // 投稿ボタンのクリックイベント
-        reportButton.onclick = () => {
-            window.location.href = 'report.html';
-        };
-
+        logoutLink.style.display = 'block'; // ログアウトボタンを表示
+        reportButton.style.display = 'flex'; // 投稿ボタンを表示
+        
     } else {
-        console.log("未ログインユーザー");
+        // ユーザーがログインしていない場合 (ゲストモード)
+        console.log("ユーザーはログインしていません。ゲストモードで表示します。");
         userStatusElement.textContent = 'ゲストモード';
-        logoutLink.style.display = 'none';
-        reportButton.style.display = 'none';
-
-        reportButton.onclick = null;
+        logoutLink.style.display = 'none'; // ログアウトボタンを非表示
+        reportButton.style.display = 'none'; // 投稿ボタンを非表示
     }
 });
 
@@ -50,13 +44,28 @@ if (logoutLink) {
         try {
             await auth.signOut();
             alert('ログアウトしました。');
-            window.location.href = 'index.html';
+            window.location.href = 'index.html'; // ログインページへリダイレクト
         } catch (error) {
             console.error("ログアウトエラー:", error);
             alert('ログアウト中にエラーが発生しました。');
         }
     });
 }
+
+// ゲストユーザーが投稿ボタンを押した時の処理
+if (reportButton) {
+    reportButton.addEventListener('click', () => {
+        // ログイン状態を再度チェック
+        if (!auth.currentUser) {
+            alert('投稿するにはログインが必要です。');
+            window.location.href = 'index.html';
+            return;
+        }
+        // 投稿機能（ダミー）
+        alert('新しいメモを追加する機能はまだ実装されていません。');
+    });
+}
+
 
 // マップボタンの機能（ダミー）
 if (mapButton) {
@@ -67,8 +76,9 @@ if (mapButton) {
 
 // 初期化処理
 document.addEventListener('DOMContentLoaded', () => {
-    // 統計データ更新（テスト用ランダム）
+    // データ更新（実際の実装では API から取得）
     function updateStats() {
+        // 統計データの更新
         const stats = {
             totalReports: Math.floor(Math.random() * 50) + 220,
             thisWeek: Math.floor(Math.random() * 10) + 8,
@@ -78,16 +88,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.keys(stats).forEach(key => {
             const element = document.getElementById(key);
-            if (element) element.textContent = stats[key];
+            if (element) {
+                element.textContent = stats[key];
+            }
         });
     }
 
-    updateStats();
-
-    // Service Worker登録（PWA対応）
+    // PWA対応の準備（Service Worker登録など）
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
-            .then(() => console.log('Service Worker registered'))
-            .catch(() => console.log('Service Worker registration failed'));
+            .then(registration => console.log('SW registered'))
+            .catch(error => console.log('SW registration failed'));
     }
 });

@@ -1,5 +1,5 @@
 // Firebaseプロジェクトの設定情報
-// ★★★ あなたのFirebaseプロジェクト設定に置き換えてください ★★★
+// ★★★ ユーザーから提供された設定情報に置き換え済み ★★★
 const firebaseConfig = {
     apiKey: "AIzaSyBMmpRvHLrXwwyKGi6IH4IH8IQkE3fjH7w",
     authDomain: "ti-kimemo.firebaseapp.com",
@@ -17,34 +17,69 @@ const db = firebase.firestore();
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    const dashboardLoginButton = document.querySelector('.header .login-button');
+    const dashboardLoginButton = document.getElementById('dashboard-login-button');
+    const accountAvatar = document.getElementById('account-avatar');
+    const userAvatarImg = document.getElementById('user-avatar-img');
     const dashboardLogoutButton = document.getElementById('logout-button');
+    const googleLoginBtn = document.getElementById('google-login-btn');
+
+    // ダッシュボードページなら初期表示を必ず「ログイン表示・ログアウト非表示」にする
+    if (dashboardLoginButton && document.body.classList.contains('dashboard-page')) {
+        dashboardLoginButton.style.display = 'inline-flex';
+    }
+    if (accountAvatar && document.body.classList.contains('dashboard-page')) {
+        accountAvatar.style.display = 'none';
+    }
+
+    // 投稿ボタンの挙動をログイン状態に応じて切り替える
+    function setupReportButtons(user) {
+        const reportButtons = document.querySelectorAll('.cta-button, .floating-button.primary');
+        reportButtons.forEach(button => {
+            button.onclick = function(e) {
+                e.preventDefault();
+                if (!user) {
+                    showDialog('投稿するにはログインが必要です。');
+                    window.location.href = 'index.html';
+                } else {
+                    showDialog('投稿画面に移行します');
+                    setTimeout(() => {
+                        window.location.href = 'report.html';
+                    }, 600); // ダイアログを少し表示してから遷移
+                }
+            };
+        });
+    }
 
     auth.onAuthStateChanged(user => {
-        const path = window.location.pathname;
+        const isLoginPage = location.pathname.endsWith('index.html');
+        const isDashboardPage = location.pathname.endsWith('dashboard.html');
+
+        // ログイン画面でログイン済みの場合のみダッシュボードに遷移
+        if (user && isLoginPage) {
+            window.location.href = 'dashboard.html';
+            return; // 以降の表示制御は不要
+        }
 
         if (user) {
             console.log("ユーザーがログインしています:", user.email);
-            // ログイン済みユーザーはログイン/新規登録ページにアクセスした場合のみリダイレクト
-            if (path.includes('index.html') || path.includes('register.html')) {
-                window.location.href = 'dashboard.html';
-            }
-            if (dashboardLoginButton) {
+            if (dashboardLoginButton && isDashboardPage) {
                 dashboardLoginButton.style.display = 'none';
             }
-            if (dashboardLogoutButton) {
-                dashboardLogoutButton.style.display = 'inline-flex';
+            if (accountAvatar && isDashboardPage) {
+                userAvatarImg.src = user.photoURL || 'https://www.gravatar.com/avatar?d=mp';
+                accountAvatar.style.display = 'inline-flex';
             }
         } else {
             console.log("ユーザーはログアウトしています。");
-            // ダッシュボードページではリダイレクトしない
-            if (dashboardLoginButton) {
+            if (dashboardLoginButton && isDashboardPage) {
                 dashboardLoginButton.style.display = 'inline-flex';
             }
-            if (dashboardLogoutButton) {
-                dashboardLogoutButton.style.display = 'none';
+            if (accountAvatar && isDashboardPage) {
+                accountAvatar.style.display = 'none';
+                userAvatarImg.src = '';
             }
         }
+        setupReportButtons(user);
     });
 
     if (loginForm) {
@@ -54,7 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = loginForm.password.value;
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                alert(`ログインしました！`);
+                // ログイン成功時に即座にダッシュボードへ遷移
+                window.location.href = 'dashboard.html';
             } catch (error) {
                 console.error("ログインエラー:", error);
                 alert(`ログインに失敗しました: ${error.message}`);
@@ -112,7 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     infoMessage.textContent = '登録が完了しました。ダッシュボードに移動します。';
                     infoMessage.style.display = 'block';
                 }
-                setTimeout(() => { /* onAuthStateChangedがリダイレクトを処理 */ }, 2000);
+                // 2秒後にダッシュボードへ遷移
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
             } catch (error) {
                 console.error("新規登録エラー:", error);
                 if (errorMessage) {
@@ -125,14 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (document.body.classList.contains('dashboard-page')) {
         updateStats();
-        const reportButtons = document.querySelectorAll('.cta-button, .floating-button.primary');
-        // 投稿ボタンのクリックイベントは、ログイン状態に応じて処理を変更
-        reportButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // 投稿処理はreportDanger関数内で行う
-                reportDanger(e);
-            });
-        });
     }
 
     const reportForm = document.getElementById('report-form');
@@ -155,14 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const title = reportForm['report-title'].value;
             const type = reportForm['report-type'].value;
             const location = reportForm['report-location'].value;
             const description = reportForm['report-description'].value;
 
             try {
                 await db.collection('reports').add({
-                    title: title,
                     type: type,
                     location: location,
                     description: description,
@@ -203,6 +232,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // アカウント画像クリックでアカウント情報画面へ
+    if (userAvatarImg) {
+        userAvatarImg.addEventListener('click', () => {
+            window.location.href = 'account.html';
+        });
+    }
+
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Googleログインに失敗しました: ' + error.message);
+            }
+        });
+    }
+
+    function showDialog(message) {
+        const dialog = document.getElementById('custom-dialog');
+        const dialogMsg = document.getElementById('custom-dialog-message');
+        const dialogClose = document.getElementById('custom-dialog-close');
+        if (!dialog || !dialogMsg || !dialogClose) {
+            // ダイアログ要素が見つからない場合はalertで代用
+            alert(message);
+            return;
+        }
+        dialogMsg.textContent = message;
+        dialog.style.display = 'flex';
+        dialogClose.onclick = () => {
+            dialog.style.display = 'none';
+        };
+    }
 });
 
 function updateStats() {
@@ -219,40 +284,37 @@ function updateStats() {
         }
     });
 }
-function reportDanger(e) {
-    // ログインしている場合は続行、未ログインの場合は警告
+function reportDanger() {
     if (!auth.currentUser) {
-        e.preventDefault(); // デフォルトの動作をキャンセル
-        alert('危険を報告するにはログインが必要です。');
+        showDialog('危険を報告するにはログインが必要です。');
         window.location.href = 'index.html';
         return;
     }
-    // ログイン済みの場合の処理
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             console.log('現在位置:', position.coords.latitude, position.coords.longitude);
-            alert('危険情報の投稿画面を開きます\n現在位置: ' + position.coords.latitude.toFixed(4) + ', ' + position.coords.longitude.toFixed(4));
+            showDialog('危険情報の投稿画面を開きます\n現在位置: ' + position.coords.latitude.toFixed(4) + ', ' + position.coords.longitude.toFixed(4));
         }, function(error) {
             console.log('位置情報の取得に失敗:', error);
-            alert('危険情報の投稿画面を開きます');
+            showDialog('危険情報の投稿画面を開きます');
         });
     } else {
-        alert('危険情報の投稿画面を開きます');
+        showDialog('危険情報の投稿画面を開きます');
     }
 }
 function viewMap() {
     console.log('マップを表示します');
-    alert('危険情報マップを表示します');
+    showDialog('危険情報マップを表示します');
 }
 function openFullMap() {
     console.log('詳細マップを開きます');
-    alert('詳細マップを表示します');
+    showDialog('詳細マップを表示します');
 }
 function filterByType(type) {
     console.log(`${type}の危険情報でフィルタリングします`);
-    alert(`${type}の危険情報を表示します`);
+    showDialog(`${type}の危険情報を表示します`);
 }
 function viewReport(reportId) {
     console.log(`報告 ${reportId} の詳細を表示します`);
-    alert(`報告の詳細を表示します: ${reportId}`);
+    showDialog(`報告の詳細を表示します: ${reportId}`);
 }

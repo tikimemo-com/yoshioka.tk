@@ -9,51 +9,46 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
+<body class="register-page">
     <div class="login-container">
-        <div class="login-box">
-            <h1>新規登録</h1>
-            <p id="error-message" class="error-message"></p>
-            <p id="info-message" class="info-message" style="display: none; color: #3498db;"></p>
-
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="email">メールアドレス</label>
-                    <input type="email" id="email" placeholder="メールアドレスを入力" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">パスワード</label>
-                    <input type="password" id="password" placeholder="パスワードを入力 (6文字以上)" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword">パスワード（確認）</label>
-                    <input type="password" id="confirmPassword" placeholder="パスワードをもう一度入力" required>
-                </div>
-
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="agreeToTerms" required>
-                    <label for="agreeToTerms" class="checkbox-label">
-                        <a href="privacy.html" target="_blank">プライバシーポリシー</a>と
-                        <a href="terms.html" target="_blank">利用規約</a>に同意する
-                    </label>
-                </div>
-
-                <button type="submit" class="btn btn-primary">登録する</button>
-            </form>
-            
-            <div class="links">
-                <a href="index.html">ログイン</a>
-            </div>
-            
-            <div class="divider">
-                <hr>
-                <span>または</span>
-                <hr>
-            </div>
-            <a href="dashboard.html" class="guest-button">ゲストとして閲覧</a>
+        <div class="header">
+            <h2>ちキメモ</h2>
+            <p>地域の危険情報をみんなで共有</p>
         </div>
+        <h1>新規登録</h1>
+        <p id="error-message" class="error-message"></p>
+        <p id="info-message" class="info-message" style="display: none; color: #3498db;"></p>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">メールアドレス</label>
+                <input type="email" id="email" name="email" placeholder="メールアドレスを入力" required>
+            </div>
+            <div class="form-group">
+                <label for="password">パスワード</label>
+                <input type="password" id="password" name="password" placeholder="パスワードを入力 (6文字以上)" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">パスワード（確認）</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="パスワードをもう一度入力" required>
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="agreeToTerms" name="agreeToTerms" required>
+                <span>
+                    <a href="privacy.html" target="_blank">プライバシーポリシー</a>と
+                    <a href="terms.html" target="_blank">利用規約</a>に同意する
+                </span>
+            </div>
+            <button type="submit" class="login-btn">登録する</button>
+        </form>
+        <a href="index.html" class="register-btn">ログイン</a>
+        <div class="divider">
+            <hr>
+            <span>または</span>
+            <hr>
+        </div>
+        <a href="dashboard.html" class="guest-button">ゲストとして閲覧</a>
     </div>
     <script src="script.js"></script>
-    <body class="register-page">
 </body>
 </html>

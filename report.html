@@ -1,54 +1,219 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>危険情報投稿 - ちキメモ</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>危険情報を投稿 - ちキメモ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="script.js" defer></script>
+    <style>
+        .report-center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f4f4f5;
+        }
+        .report-form-box {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.10);
+            max-width: 500px;
+            width: 100%;
+            margin: 2rem auto;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .location-methods {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .location-methods button {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .location-methods button:hover {
+            background: #2980b9;
+        }
+        .location-map-preview {
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        #map-area {
+            width: 100%;
+            height: 250px;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+    </style>
 </head>
-<body class="report-page">
-  <header class="header">
-    <div class="header-content">
-      <a href="dashboard.html" class="logo">🚨 ThikiMemo</a>
-      <button id="logout-button" style="display:none;">ログアウト</button>
+<body>
+    <div class="report-center-container">
+        <div class="report-form-box">
+            <div class="header">
+                <h2>危険情報を投稿</h2>
+                <p>あなたの街の危険情報を共有しましょう</p>
+            </div>
+            <form id="report-form">
+                <div class="form-group">
+                    <label for="report-type">危険の種類</label>
+                    <select id="report-type" name="report-type" required>
+                        <option value="">選択してください</option>
+                        <option value="traffic">交通関連</option>
+                        <option value="disaster">自然災害</option>
+                        <option value="crime">治安・防犯</option>
+                        <option value="infrastructure">インフラ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="report-location">場所（緯度,経度）</label>
+                    <div class="location-methods">
+                        <button type="button" id="get-current-location">現在地取得</button>
+                        <button type="button" id="select-from-map">マップから選択</button>
+                    </div>
+                    <input type="text" id="report-location" name="report-location" placeholder="例: 35.681236,139.767125" required>
+                    <div class="location-map-preview" id="location-map-preview" style="display:none;">
+                        <span id="location-coords"></span>
+                    </div>
+                    <div id="map-area"></div>
+                    <div id="map-search-area" style="display:none; margin: 0.5rem 0;">
+                        <input type="text" id="map-search-box" placeholder="地名や住所で検索" style="width:70%;padding:0.5rem;border-radius:5px;border:1px solid #ddd;">
+                        <button type="button" id="map-search-btn" style="padding:0.5rem 1rem;border-radius:5px;background:#3498db;color:#fff;border:none;cursor:pointer;">検索</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="report-description">詳細</label>
+                    <textarea id="report-description" name="report-description" rows="4" placeholder="詳細な状況や注意点など" required></textarea>
+                </div>
+                <button type="submit" class="login-btn">投稿する</button>
+            </form>
+            <p id="report-message" class="message-text"></p>
+            <div class="divider">
+                <hr>
+                <span>または</span>
+                <hr>
+            </div>
+            <a href="dashboard.html" class="guest-button">ダッシュボードに戻る</a>
+        </div>
     </div>
-  </header>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const getCurrentBtn = document.getElementById('get-current-location');
+    const selectMapBtn = document.getElementById('select-from-map');
+    const reportLocationInput = document.getElementById('report-location');
+    const locationCoords = document.getElementById('location-coords');
+    const locationMapPreview = document.getElementById('location-map-preview');
+    const mapArea = document.getElementById('map-area');
+    const mapSearchArea = document.getElementById('map-search-area');
+    const mapSearchBox = document.getElementById('map-search-box');
+    const mapSearchBtn = document.getElementById('map-search-btn');
 
-  <main class="main-container">
-    <h1>危険情報を投稿する</h1>
-    <form id="report-form">
-      <div class="form-group">
-        <label for="report-title">タイトル</label>
-        <input type="text" id="report-title" name="report-title" required placeholder="危険のタイトルを入力" />
-      </div>
-      <div class="form-group">
-        <label for="report-type">種類</label>
-        <select id="report-type" name="report-type" required>
-          <option value="">選択してください</option>
-          <option value="traffic">交通関連</option>
-          <option value="disaster">自然災害</option>
-          <option value="crime">治安・防犯</option>
-          <option value="infrastructure">インフラ</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="report-location">場所</label>
-        <input type="text" id="report-location" name="report-location" required placeholder="危険箇所の場所を入力" />
-      </div>
-      <div class="form-group">
-        <label for="report-description">詳細説明</label>
-        <textarea id="report-description" name="report-description" rows="5" required placeholder="危険の詳細を入力"></textarea>
-      </div>
-      <div id="report-message" class="message" style="display:none;"></div>
-      <button type="submit" class="submit-btn">投稿する</button>
-    </form>
-  </main>
+    let leafletMap = null;
+    let marker = null;
+
+    getCurrentBtn.onclick = function() {
+        if (!navigator.geolocation) {
+            alert('位置情報取得に対応していません');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            reportLocationInput.value = `${lat},${lng}`;
+            locationCoords.textContent = `現在地: ${lat}, ${lng}`;
+            locationMapPreview.style.display = 'block';
+            mapArea.style.display = 'none';
+            mapSearchArea.style.display = 'none';
+        }, function(err) {
+            alert('位置情報の取得に失敗しました');
+        });
+    };
+
+    selectMapBtn.onclick = function() {
+        mapArea.style.display = 'block';
+        locationMapPreview.style.display = 'none';
+        mapSearchArea.style.display = 'block';
+
+        // マップ初期化（初回のみ）
+        if (!leafletMap) {
+            leafletMap = L.map('map-area').setView([35.681236, 139.767125], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(leafletMap);
+
+            leafletMap.on('click', function(e) {
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+                reportLocationInput.value = `${lat},${lng}`;
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(leafletMap);
+                }
+            });
+
+            mapSearchBtn.onclick = async function() {
+                const query = mapSearchBox.value.trim();
+                if (!query) return;
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&accept-language=ja`;
+                try {
+                    const res = await fetch(url, { headers: { 'User-Agent': 'thikimemo-app/1.0' } });
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat).toFixed(6);
+                        const lng = parseFloat(data[0].lon).toFixed(6);
+                        leafletMap.setView([lat, lng], 16);
+                        reportLocationInput.value = `${lat},${lng}`;
+                        if (marker) {
+                            marker.setLatLng([lat, lng]);
+                        } else {
+                            marker = L.marker([lat, lng]).addTo(leafletMap);
+                        }
+                        locationCoords.textContent = `検索結果: ${data[0].display_name}`;
+                        locationMapPreview.style.display = 'block';
+                    } else {
+                        locationCoords.textContent = '検索結果が見つかりませんでした';
+                        locationMapPreview.style.display = 'block';
+                    }
+                } catch {
+                    locationCoords.textContent = '検索エラー';
+                    locationMapPreview.style.display = 'block';
+                }
+            };
+        }
+    };
+});
+    </script>
+</body>
+</html>
+});
+    </script>
 </body>
 </html>
