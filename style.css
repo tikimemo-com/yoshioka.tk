@@ -86,12 +86,16 @@ body.register-page {
 
 .register-btn,
 .guest-button {
-  display: block;
-  margin-top: 1rem;
-  color: #be6229;
-  text-decoration: none;
+  width: 100%;
+  padding: 1rem;
+  background: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
   font-weight: bold;
-  transition: color 0.3s;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .register-btn:hover,
@@ -171,3 +175,4 @@ body.register-page {
   color: #fff;
 
 }
+
