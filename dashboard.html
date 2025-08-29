@@ -23,185 +23,96 @@
                 🚨 ThikiMemo
             </a>
             <nav class="nav-menu">
-                <a href="#" class="nav-item">マップ</a>
-                <a href="#" class="nav-item">投稿一覧</a>
-                <a href="#" class="nav-item">統計</a>
-                <a href="#" class="nav-item">設定</a>
+                <a href="report.html" class="nav-button">危険を報告</a>
+                <a href="#" class="nav-button">マップ</a>
+                <a href="#" class="nav-button">詳細</a>
+                <a href="#" id="dashboard-login-button" class="cta-button">ログイン</a>
+                <div id="account-avatar">
+                    <img id="user-avatar-img" src="" alt="アカウントアバター">
+                    <button id="logout-button" class="cta-button" style="display:none; margin-left:10px;">ログアウト</button>
+                </div>
             </nav>
-            <a href="index.html" class="login-button" id="dashboard-login-button">ログイン</a>
-            <div id="account-avatar" style="display:none;">
-                <img id="user-avatar-img" src="" alt="アカウント" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #3498db; cursor:pointer;">
-            </div>
         </div>
     </header>
-
-    <main class="main-container">
-        <section class="hero-section">
-            <h1 class="hero-title">地域の安全を守る</h1>
-            <p class="hero-subtitle">
-                あなたの街の危険情報をみんなで共有し、<br>
-                より安全なコミュニティを作りましょう
-            </p>
-            <div class="cta-buttons">
-                <a href="#" class="cta-button" onclick="reportDanger()">
-                    📍 危険を報告
-                </a>
-                <a href="#" class="cta-button secondary" onclick="viewMap()">
-                    🗺️ マップを見る
-                </a>
+    <main class="dashboard-container">
+        <section class="dashboard-summary">
+            <div class="summary-card">
+                <h3>総投稿数</h3>
+                <span id="totalReports" class="stat-number">0</span>
+            </div>
+            <div class="summary-card">
+                <h3>今週の投稿数</h3>
+                <span id="thisWeek" class="stat-number">0</span>
+            </div>
+            <div class="summary-card">
+                <h3>アクティブユーザー</h3>
+                <span id="activeUsers" class="stat-number">0</span>
+            </div>
+            <div class="summary-card">
+                <h3>解決済み件数</h3>
+                <span id="resolvedIssues" class="stat-number">0</span>
             </div>
         </section>
-
-        <section class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-number" id="totalReports">247</div>
-                <div class="stat-label">総投稿数</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="thisWeek">12</div>
-                <div class="stat-label">今週の投稿</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="activeUsers">89</div>
-                <div class="stat-label">アクティブユーザー</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="resolvedIssues">156</div>
-                <div class="stat-label">解決済み</div>
-            </div>
-        </section>
-
-        <section class="danger-types-section">
-            <h2 class="section-title">危険の種類</h2>
-            <div class="danger-grid">
-                <div class="danger-card traffic" onclick="filterByType('traffic')">
-                    <div class="danger-icon">🚗</div>
-                    <h3 class="danger-title">交通関連</h3>
-                    <p class="danger-count">87件の報告</p>
-                    <p class="danger-examples">交通事故多発地点、道路工事、信号故障など</p>
-                </div>
-                <div class="danger-card disaster" onclick="filterByType('disaster')">
-                    <div class="danger-icon">⚠️</div>
-                    <h3 class="danger-title">自然災害</h3>
-                    <p class="danger-count">34件の報告</p>
-                    <p class="danger-examples">土砂崩れ、浸水注意、強風被害など</p>
-                </div>
-                <div class="danger-card crime" onclick="filterByType('crime')">
-                    <div class="danger-icon">🔐</div>
-                    <h3 class="danger-title">治安・防犯</h3>
-                    <p class="danger-count">52件の報告</p>
-                    <p class="danger-examples">不審者情報、盗難多発地区、暗い道路など</p>
-                </div>
-                <div class="danger-card infrastructure" onclick="filterByType('infrastructure')">
-                    <div class="danger-icon">🏗️</div>
-                    <h3 class="danger-title">インフラ</h3>
-                    <p class="danger-count">74件の報告</p>
-                    <p class="danger-examples">道路損傷、電柱傾斜、マンホール破損など</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="map-preview">
-            <h2 class="section-title">危険情報マップ</h2>
+        <section class="dashboard-map">
+            <h2>リアルタイム危険情報マップ</h2>
             <div id="danger-map"></div>
         </section>
-
-        <section class="recent-reports">
-            <h2 class="section-title">最新の報告</h2>
-            <div class="recent-list" id="recent-list">
-                <!-- Firestoreから取得した投稿がここに表示されます -->
-            </div>
+        <section class="dashboard-reports">
+            <h2>最近の投稿</h2>
+            <div id="report-list">
+                </div>
         </section>
     </main>
 
-    <div class="floating-actions">
-        <button class="floating-button primary" onclick="reportDanger()" title="危険を報告">
-            📍
-        </button>
-        <button class="floating-button secondary" onclick="viewMap()" title="マップを表示">
-            🗺️
-        </button>
-    </div>
-    <!-- ダイアログ表示領域 -->
-    <div id="custom-dialog" class="custom-dialog" style="display:none;">
-        <div class="custom-dialog-content">
-            <span id="custom-dialog-message"></span>
-            <button id="custom-dialog-close" class="login-btn" style="margin-top:1rem;">閉じる</button>
-        </div>
-    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <script src="script.js" defer></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Firestoreから最新の投稿を取得して表示
-    if (window.firebase && firebase.firestore) {
-        const db = firebase.firestore();
-        const recentList = document.getElementById('recent-list');
-        if (recentList) {
-            db.collection('reports')
-                .orderBy('timestamp', 'desc')
-                .limit(10)
-                .get()
-                .then(snapshot => {
-                    recentList.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const typeIcon = {
-                            traffic: '🚗',
-                            disaster: '⚠️',
-                            crime: '🔐',
-                            infrastructure: '🏗️'
-                        }[data.type] || '❓';
-                        const typeClass = data.type || '';
-                        const location = data.location || '';
-                        const description = data.description || '';
-                        const time = data.timestamp && data.timestamp.toDate
-                            ? timeAgo(data.timestamp.toDate())
-                            : '';
-                        recentList.innerHTML += `
-                            <div class="recent-item ${typeClass}" onclick="viewReport('${doc.id}')">
-                                <div class="recent-icon">${typeIcon}</div>
-                                <div class="recent-content">
-                                    <div class="recent-details">
-                                        <div class="recent-location">📍 ${location}</div>
-                                        <div class="recent-time">⏰ ${time}</div>
-                                        <div class="recent-type">${typeLabel[data.type] || ''}</div>
-                                    </div>
-                                    <div class="recent-title">${description}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                });
-        }
-    }
-    // 危険情報マップ表示
-    const dangerMapDiv = document.getElementById('danger-map');
-    let dangerMap;
-    let dangerMarkers = [];
+        document.addEventListener('DOMContentLoaded', () => {
+            const dangerMap = L.map('danger-map').setView([36.377, 139.019], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(dangerMap);
 
-    // 英語→日本語変換用
-    const typeLabel = {
-        traffic: '交通関連',
-        disaster: '自然災害',
-        crime: '治安・防犯',
-        infrastructure: 'インフラ'
-    };
-
-    if (dangerMapDiv) {
-        dangerMap = L.map('danger-map').setView([35.681236, 139.767125], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(dangerMap);
-
-        if (window.firebase && firebase.firestore) {
             const db = firebase.firestore();
-            db.collection('reports')
-                .orderBy('timestamp', 'desc')
-                .limit(50)
-                .get()
-                .then(snapshot => {
+            const dangerMarkers = [];
+            const reportListElement = document.getElementById('report-list');
+            const typeLabel = {
+                traffic: '交通',
+                disaster: '災害',
+                crime: '犯罪',
+                infrastructure: 'インフラ'
+            };
+
+            updateDashboardMap();
+            db.collection('reports').orderBy('timestamp', 'desc').limit(5).onSnapshot(snapshot => {
+                reportListElement.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const reportItem = document.createElement('div');
+                    reportItem.className = 'report-item';
+                    reportItem.innerHTML = `
+                        <div class="report-header">
+                            <span class="report-type">${typeLabel[data.type] || ''}</span>
+                            <span class="report-time">${timeAgo(data.timestamp.toDate())}</span>
+                        </div>
+                        <p class="report-description">${data.description}</p>
+                    `;
+                    reportListElement.appendChild(reportItem);
+                });
+            });
+
+            function updateDashboardMap() {
+                db.collection('reports').get().then(snapshot => {
+                    dangerMarkers.forEach(marker => marker.remove());
+                    dangerMarkers.length = 0;
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        if (data.location && data.location.match(/^[-+]?\d+\.\d+,\s*[-+]?\d+\.\d+$/)) {
+                        if (data.location && data.location.match(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/)) {
                             const [lat, lng] = data.location.split(',').map(Number);
                             const typeIcon = {
                                 traffic: '🚗',
@@ -221,19 +132,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 });
-        }
-    }
+            }
 
-    // 相対時間表示
-    function timeAgo(date) {
-        const now = new Date();
-        const diff = Math.floor((now - date) / 1000);
-        if (diff < 60) return `${diff}秒前`;
-        if (diff < 3600) return `${Math.floor(diff/60)}分前`;
-        if (diff < 86400) return `${Math.floor(diff/3600)}時間前`;
-        return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
-    }
-});
-</script>
+            // 相対時間表示
+            function timeAgo(date) {
+                const now = new Date();
+                const diff = Math.floor((now - date) / 1000);
+                if (diff < 60) return `${diff}秒前`;
+                if (diff < 3600) return `${Math.floor(diff/60)}分前`;
+                if (diff < 86400) return `${Math.floor(diff/3600)}時間前`;
+                return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
+            }
+        });
+    </script>
 </body>
 </html>
