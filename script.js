@@ -14,6 +14,32 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// ダッシュボードの統計データをFirebaseから取得・更新する非同期関数
+async function updateStatsFromFirebase() {
+    try {
+        const totalReportsSnapshot = await db.collection('reports').get();
+        const totalReportsCount = totalReportsSnapshot.size;
+
+        const totalReportsElement = document.getElementById('totalReports');
+        if (totalReportsElement) {
+            totalReportsElement.textContent = totalReportsCount;
+        }
+
+        // 必要に応じて今週の投稿数や解決済み件数なども実装
+        // const now = new Date();
+        // const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        // const thisWeekReportsSnapshot = await db.collection('reports').where('timestamp', '>=', oneWeekAgo).get();
+        // const thisWeekCount = thisWeekReportsSnapshot.size;
+        // const thisWeekElement = document.getElementById('thisWeek');
+        // if (thisWeekElement) {
+        //    thisWeekElement.textContent = thisWeekCount;
+        // }
+
+    } catch (error) {
+        console.error("統計データの取得エラー:", error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -101,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (registerForm) {
         const errorMessage = document.getElementById('error-message');
         const infoMessage = document.getElementById('info-message');
-        
+
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (errorMessage) {
@@ -116,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = registerForm.password.value;
             const confirmPassword = registerForm.confirmPassword.value;
             const agreeToTerms = registerForm.agreeToTerms.checked;
-            
+
             if (password !== confirmPassword) {
                 if (errorMessage) {
                     errorMessage.textContent = 'パスワードが一致しません。';
@@ -163,7 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (document.body.classList.contains('dashboard-page')) {
-        updateStats();
+        // ダッシュボードページではFirebaseから統計データを取得
+        updateStatsFromFirebase();
     }
 
     const reportForm = document.getElementById('report-form');
@@ -270,6 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// 既存のダミーデータ生成関数は不要なのでコメントアウト
+/*
 function updateStats() {
     const stats = {
         totalReports: Math.floor(Math.random() * 50) + 220,
@@ -284,6 +313,7 @@ function updateStats() {
         }
     });
 }
+*/
 function reportDanger() {
     if (!auth.currentUser) {
         showDialog('危険を報告するにはログインが必要です。');
