@@ -349,6 +349,8 @@ function updateDashboardContent() {
     }
 }
 
+let postMarker = null;
+
 // 全画面マップを初期化する関数
 function initFullMap(filterType) {
     const fullMapContainer = document.getElementById('full-map-container');
@@ -357,6 +359,10 @@ function initFullMap(filterType) {
     const filteredHeaderTitle = document.getElementById('filtered-header-title');
     const filteredHeaderIcon = document.getElementById('filtered-header-icon');
     const filterButtons = document.getElementById('filter-buttons');
+    const mapPostButton = document.getElementById('map-post-button');
+    const mapReportDialog = document.getElementById('map-report-dialog');
+    const mapReportForm = document.getElementById('mapReportForm');
+    const mapReportLocationInput = document.getElementById('map-report-location');
 
     if (fullMapContainer) {
         const fullMap = L.map('full-map-container').setView([35.681236, 139.767125], 12);
@@ -432,6 +438,75 @@ function initFullMap(filterType) {
         };
 
         updateMapAndList(filterType);
+
+        // マップから投稿する機能
+        if (mapPostButton) {
+            mapPostButton.addEventListener('click', () => {
+                const user = auth.currentUser;
+                if (!user) {
+                    showDialog('投稿するにはログインが必要です。');
+                    return;
+                }
+                showDialog('マップ上の投稿したい場所をクリックしてください');
+                fullMap.getContainer().style.cursor = 'crosshair';
+                fullMap.on('click', onMapClick);
+            });
+        }
+        
+        function onMapClick(e) {
+            fullMap.off('click', onMapClick);
+            fullMap.getContainer().style.cursor = '';
+            
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+
+            if (postMarker) {
+                postMarker.setLatLng(e.latlng);
+            } else {
+                postMarker = L.marker(e.latlng).addTo(fullMap);
+            }
+            
+            mapReportLocationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            mapReportDialog.style.display = 'flex';
+        }
+
+        mapReportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) {
+                showDialog('ログインが必要です。');
+                return;
+            }
+
+            db.collection('reports').add({
+                type: document.getElementById('map-report-type').value,
+                description: document.getElementById('map-report-description').value,
+                location: mapReportLocationInput.value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                uid: user.uid,
+                status: 'unresolved'
+            })
+            .then(() => {
+                closeMapReportDialog();
+                showDialog('危険情報が正常に投稿されました！');
+                mapReportForm.reset();
+            })
+            .catch(error => {
+                console.error('投稿エラー:', error);
+                showDialog('投稿に失敗しました。');
+            });
+        });
+    }
+}
+
+function closeMapReportDialog() {
+    const dialog = document.getElementById('map-report-dialog');
+    if (dialog) {
+        dialog.style.display = 'none';
+        if (postMarker) {
+            postMarker.remove();
+            postMarker = null;
+        }
     }
 }
 

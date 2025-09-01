@@ -526,7 +526,6 @@ body.dashboard-page {
   }
 }
 
-/* full-map.html 用のスタイル */
 .filtered-reports-container {
     position: absolute;
     top: 20px;
@@ -632,4 +631,111 @@ body.dashboard-page {
     background: #3498db;
     border-color: #3498db;
     color: #fff;
+}
+
+/* 投稿用ダイアログのスタイル */
+.map-report-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px;
+    display: none;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.map-report-dialog h3 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-top: 0;
+}
+
+.map-report-dialog .form-group {
+    text-align: left;
+}
+
+.map-report-dialog label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: bold;
+}
+
+.map-report-dialog input,
+.map-report-dialog textarea,
+.map-report-dialog select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.map-report-dialog textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.map-report-dialog .dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.map-report-dialog .dialog-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.map-report-dialog .dialog-buttons .cancel-btn {
+    background: #bdc3c7;
+    color: #fff;
+}
+.map-report-dialog .dialog-buttons .cancel-btn:hover {
+    background: #95a5a6;
+}
+
+.map-report-dialog .dialog-buttons .submit-btn {
+    background: #3498db;
+    color: #fff;
+}
+.map-report-dialog .dialog-buttons .submit-btn:hover {
+    background: #2980b9;
+}
+
+.map-post-floating-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 2.5rem;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.map-post-floating-button:hover {
+    transform: scale(1.05);
 }

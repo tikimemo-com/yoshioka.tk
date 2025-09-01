@@ -60,5 +60,35 @@
             </div>
         </div>
     </div>
+
+    <button class="map-post-floating-button" id="map-post-button" title="マップに投稿">
+        +
+    </button>
+
+    <div id="map-report-dialog" class="map-report-dialog">
+        <h3>新しい投稿</h3>
+        <form id="mapReportForm">
+            <div class="form-group">
+                <label for="map-report-type">投稿の種類</label>
+                <select id="map-report-type" name="map-report-type" required>
+                    <option value="kiken">危険</option>
+                    <option value="johou">情報</option>
+                    <option value="chui">注意</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="map-report-description">詳細</label>
+                <textarea id="map-report-description" name="map-report-description" rows="4" placeholder="危険情報について詳しく入力してください" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="map-report-location">位置情報</label>
+                <input type="text" id="map-report-location" name="map-report-location" placeholder="緯度, 経度" readonly required>
+            </div>
+            <div class="dialog-buttons">
+                <button type="button" class="btn cancel-btn" onclick="closeMapReportDialog()">キャンセル</button>
+                <button type="submit" class="btn submit-btn">投稿</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
