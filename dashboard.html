@@ -72,31 +72,25 @@
         </section>
 
         <section class="danger-types-section">
-            <h2 class="section-title">危険の種類</h2>
+            <h2 class="section-title">投稿の種類</h2>
             <div class="danger-grid">
-                <div class="danger-card traffic" onclick="openFilteredMap('traffic')">
-                    <div class="danger-icon">🚗</div>
-                    <h3 class="danger-title">交通関連</h3>
-                    <p class="danger-count"><span id="trafficCount">0</span>件の報告</p>
-                    <p class="danger-examples">交通事故多発地点、道路工事、信号故障など</p>
+                <div class="danger-card kiken" onclick="openFilteredMap('kiken')">
+                    <div class="danger-icon">🚨</div>
+                    <h3 class="danger-title">危険</h3>
+                    <p class="danger-count"><span id="kikenCount">0</span>件の報告</p>
+                    <p class="danger-examples">不審者情報、緊急の災害、交通事故など</p>
                 </div>
-                <div class="danger-card disaster" onclick="openFilteredMap('disaster')">
+                <div class="danger-card johou" onclick="openFilteredMap('johou')">
+                    <div class="danger-icon">ℹ️</div>
+                    <h3 class="danger-title">情報</h3>
+                    <p class="danger-count"><span id="johouCount">0</span>件の報告</p>
+                    <p class="danger-examples">イベント、交通規制、工事のお知らせなど</p>
+                </div>
+                <div class="danger-card chui" onclick="openFilteredMap('chui')">
                     <div class="danger-icon">⚠️</div>
-                    <h3 class="danger-title">自然災害</h3>
-                    <p class="danger-count"><span id="disasterCount">0</span>件の報告</p>
-                    <p class="danger-examples">土砂崩れ、浸水注意、強風被害など</p>
-                </div>
-                <div class="danger-card crime" onclick="openFilteredMap('crime')">
-                    <div class="danger-icon">🔐</div>
-                    <h3 class="danger-title">治安・防犯</h3>
-                    <p class="danger-count"><span id="crimeCount">0</span>件の報告</p>
-                    <p class="danger-examples">不審者情報、盗難多発地区、暗い道路など</p>
-                </div>
-                <div class="danger-card infrastructure" onclick="openFilteredMap('infrastructure')">
-                    <div class="danger-icon">🏗️</div>
-                    <h3 class="danger-title">インフラ</h3>
-                    <p class="danger-count"><span id="infrastructureCount">0</span>件の報告</p>
-                    <p class="danger-examples">道路損傷、電柱傾斜、マンホール破損など</p>
+                    <h3 class="danger-title">注意</h3>
+                    <p class="danger-count"><span id="chuiCount">0</span>件の報告</p>
+                    <p class="danger-examples">落石注意、滑りやすい道路、暗い道など</p>
                 </div>
             </div>
         </section>
@@ -107,7 +101,7 @@
         </section>
 
         <section class="recent-reports">
-            <h2 class="section-title">最新の報告</h2>
+            <h2 class="section-title">最新の投稿</h2>
             <div class="recent-list" id="recent-list">
                 </div>
         </section>
