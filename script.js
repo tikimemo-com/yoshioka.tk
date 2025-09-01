@@ -16,17 +16,15 @@ const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // 危険情報のタイプとアイコンを一元管理
 const typeLabels = {
-    traffic: '交通関連',
-    disaster: '自然災害',
-    crime: '治安・防犯',
-    infrastructure: 'インフラ'
+    kiken: '危険',
+    johou: '情報',
+    chui: '注意'
 };
 
 const typeIcons = {
-    traffic: '🚗',
-    disaster: '⚠️',
-    crime: '🔐',
-    infrastructure: '🏗️'
+    kiken: '🚨',
+    johou: 'ℹ️',
+    chui: '⚠️'
 };
 
 // DOM要素の取得 (login page)
@@ -263,7 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        const dangerTypes = ['traffic', 'disaster', 'crime', 'infrastructure'];
+        // 危険情報の種類ごとの投稿数を取得・更新
+        const dangerTypes = ['kiken', 'johou', 'chui'];
         dangerTypes.forEach(type => {
             db.collection('reports').where('type', '==', type).onSnapshot(snapshot => {
                 const countElement = document.getElementById(`${type}Count`);
@@ -411,10 +410,10 @@ function initFullMap(filterType) {
                     filteredReportsList.appendChild(reportItem);
                 });
 
-                if (filterType) {
+                if (type) {
                     filteredReportsContainer.style.display = 'block';
-                    filteredHeaderTitle.textContent = `${typeLabels[filterType] || ''} 投稿一覧`;
-                    filteredHeaderIcon.textContent = typeIcons[filterType] || '❓';
+                    filteredHeaderTitle.textContent = `${typeLabels[type] || ''} 投稿一覧`;
+                    filteredHeaderIcon.textContent = typeIcons[type] || '❓';
                 } else {
                     filteredReportsContainer.style.display = 'none';
                 }
